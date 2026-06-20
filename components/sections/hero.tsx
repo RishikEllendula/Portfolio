@@ -7,6 +7,20 @@ import { ArrowRight, Github, Linkedin, Download, Code2, Terminal, BadgeCheck } f
 import { profile, socialLinks } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 
+import dynamic from "next/dynamic";
+
+const HeroCanvas3D = dynamic(
+  () => import("@/components/canvas/three-canvas").then((mod) => mod.HeroCanvas3D),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="relative h-[350px] w-full md:h-[480px] rounded-2xl overflow-hidden bg-radial-glow border border-border/30 bg-surface/10 animate-pulse flex items-center justify-center font-mono text-xs text-muted">
+        Loading 3D Canvas...
+      </div>
+    ),
+  }
+);
+
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   github: Github,
   linkedin: Linkedin,
@@ -164,8 +178,11 @@ export function Hero() {
             initial={{ opacity: 0, y: 20, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.25, ease: "easeOut" }}
-            className="relative w-full"
+            className="flex flex-col gap-6 w-full"
           >
+            {/* 3D Canvas Visual */}
+            <HeroCanvas3D />
+
             {/* Mock IDE Card */}
             <div className="relative w-full glass rounded-2xl p-5 font-mono text-[12.5px] leading-relaxed shadow-2xl sm:text-sm">
               <div className="mb-3 flex items-center gap-2 border-b border-border pb-3">

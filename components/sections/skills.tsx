@@ -14,6 +14,19 @@ import {
 import { skillCategories } from "@/lib/data";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 import { Card } from "@/components/ui/card";
+import dynamic from "next/dynamic";
+
+const PhysicsSkillsCanvas = dynamic(
+  () => import("@/components/canvas/physics-skills").then((mod) => mod.PhysicsSkillsCanvas),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[450px] w-full rounded-2xl border border-border bg-surface/30 animate-pulse flex items-center justify-center font-mono text-xs text-muted">
+        Loading 3D Physics Canvas...
+      </div>
+    ),
+  }
+);
 
 const categoryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   programming: Code2,
@@ -62,33 +75,41 @@ export function Skills() {
           })}
         </div>
 
-        <motion.div
-          key={active}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="mt-8 grid gap-4 sm:grid-cols-2"
-        >
-          {activeCategory.items.map((skill) => (
-            <Card key={skill.name} className="p-5">
-              <div className="mb-3 flex items-center justify-between">
-                <span className="font-sans text-sm font-semibold text-foreground">
-                  {skill.name}
-                </span>
-                <span className="font-mono text-xs text-muted">{skill.level}%</span>
-              </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-border/60">
-                <motion.div
-                  initial={{ width: 0 }}
-                  whileInView={{ width: `${skill.level}%` }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.7, ease: "easeOut" }}
-                  className="h-full rounded-full bg-gradient-to-r from-primary/70 to-accent"
-                />
-              </div>
-            </Card>
-          ))}
-        </motion.div>
+        <div className="mt-8">
+          {/* Desktop & Tablet: Interactive 3D physics spheres */}
+          <div className="hidden md:block h-[550px] w-full">
+            <PhysicsSkillsCanvas items={activeCategory.items} />
+          </div>
+
+          {/* Mobile/Tablet fallback: Progress Bars */}
+          <motion.div
+            key={active}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className="grid gap-4 sm:grid-cols-2 md:hidden"
+          >
+            {activeCategory.items.map((skill) => (
+              <Card key={skill.name} className="p-5">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="font-sans text-sm font-semibold text-foreground">
+                    {skill.name}
+                  </span>
+                  <span className="font-mono text-xs text-muted">{skill.level}%</span>
+                </div>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-border/60">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${skill.level}%` }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                    className="h-full rounded-full bg-gradient-to-r from-primary/70 to-accent"
+                  />
+                </div>
+              </Card>
+            ))}
+          </motion.div>
+        </div>
       </div>
     </section>
   );

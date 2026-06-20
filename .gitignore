@@ -22,3 +22,7 @@ npm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# resume
+/public/resume.pdf
+

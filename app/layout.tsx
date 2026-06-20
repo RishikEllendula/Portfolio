@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
 import { StatusBar } from "@/components/layout/status-bar";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
@@ -61,12 +62,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
-          <Preloader />
-          <div id="top" />
-          <StatusBar />
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
+          <SmoothScrollProvider>
+            <Preloader />
+            <div id="top" />
+            <StatusBar />
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+          </SmoothScrollProvider>
         </ThemeProvider>
       </body>
     </html>

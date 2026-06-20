@@ -12,6 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArchitectureDiagram } from "@/components/projects/architecture-diagram";
 import { ScreenshotCarousel } from "@/components/projects/screenshot-carousel";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const statusVariant: Record<string, "primary" | "success" | "default"> = {
   Production: "success",
@@ -21,6 +26,38 @@ const statusVariant: Record<string, "primary" | "success" | "default"> = {
 
 export function Projects() {
   const [query, setQuery] = React.useState("");
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const triggerRef = React.useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    if (!triggerRef.current || !containerRef.current) return;
+
+    // Get the horizontal translation distance
+    const scrollWidth = containerRef.current.scrollWidth;
+    const viewportWidth = window.innerWidth;
+    const xVal = -(scrollWidth - viewportWidth + 80);
+
+    const pin = gsap.fromTo(
+      containerRef.current,
+      { x: 0 },
+      {
+        x: xVal,
+        ease: "none",
+        scrollTrigger: {
+          trigger: triggerRef.current,
+          pin: true,
+          scrub: 1,
+          start: "top top",
+          end: () => `+=${scrollWidth}`,
+          invalidateOnRefresh: true,
+        },
+      }
+    );
+
+    return () => {
+      pin.kill();
+    };
+  }, { scope: triggerRef });
 
   const featured = projects.find((p) => p.highlight);
   const rest = projects.filter((p) => !p.highlight);
@@ -41,8 +78,108 @@ export function Projects() {
     featured?.tech.some((t) => t.toLowerCase().includes(query.toLowerCase()));
 
   return (
-    <section id="projects" className="border-t border-border py-20 sm:py-28">
-      <div className="container-px mx-auto max-w-6xl">
+    <section id="projects" className="border-t border-border">
+      {/* Desktop Horizontal Pinning Section */}
+      <div ref={triggerRef} className="relative hidden md:block bg-background/50 overflow-hidden">
+        <div className="flex h-screen items-center py-10">
+          <div
+            ref={containerRef}
+            className="flex gap-8 px-12 sm:px-24"
+            style={{ width: "max-content" }}
+          >
+            {/* Header Card */}
+            <div className="w-[360px] flex-shrink-0 flex flex-col justify-center pr-6">
+              <SectionEyebrow index="03" label="Projects" />
+              <h2 className="font-sans text-4xl font-bold tracking-tightest text-foreground sm:text-5xl mt-3">
+                Things I&apos;ve shipped
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-muted">
+                Full systems, not just notebooks — each one built end-to-end with a real API,
+                a real database and a real interface.
+              </p>
+              <div className="mt-8 flex items-center gap-2 text-xs font-mono text-primary/80 animate-pulse">
+                <span>↓</span> Scroll down to slide projects
+              </div>
+            </div>
+
+            {/* Project Cards in horizontal track */}
+            {projects.map((project, idx) => (
+              <div
+                key={project.slug}
+                className="w-[440px] h-[500px] flex-shrink-0 flex flex-col justify-between glass border border-border/80 rounded-2xl p-6 hover:border-primary/40 hover:scale-[1.01] transition-all duration-300 shadow-2xl relative overflow-hidden group"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs text-muted">0{idx + 1}</span>
+                      {project.highlight && (
+                        <span className="rounded bg-primary/10 px-2 py-0.5 font-mono text-[10px] text-primary border border-primary/20">
+                          Featured
+                        </span>
+                      )}
+                    </div>
+                    <Badge variant={statusVariant[project.status]}>{project.status}</Badge>
+                  </div>
+
+                  <h3 className="font-sans text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+                    {project.name}
+                  </h3>
+
+                  <p className="mt-3 text-xs leading-relaxed text-muted line-clamp-3">
+                    {project.description}
+                  </p>
+
+                  <div className="mt-4">
+                    <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted">
+                      Key Highlights
+                    </p>
+                    <ul className="space-y-2">
+                      {project.features?.slice(0, 3).map((feat) => (
+                        <li key={feat} className="flex gap-2 text-xs text-foreground/80 line-clamp-2">
+                          <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
+                          {feat}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="mt-4 flex flex-wrap gap-1.5">
+                    {project.tech.slice(0, 5).map((t) => (
+                      <Badge key={t} variant="outline" className="text-[10px] py-0 px-1.5">
+                        {t}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4">
+                    <a
+                      href={project.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs font-medium text-muted hover:text-foreground transition-colors"
+                    >
+                      <Github className="h-3.5 w-3.5" />
+                      Source
+                    </a>
+                    <Link
+                      href={`/projects/${project.slug}`}
+                      className="flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
+                    >
+                      Case Study
+                      <ExternalLink className="h-3 w-3" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Vertical Grid Section */}
+      <div className="container-px mx-auto max-w-6xl py-20 sm:py-28 md:hidden">
         <SectionEyebrow index="03" label="Projects" />
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
