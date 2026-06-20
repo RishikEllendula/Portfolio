@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 222 23% 4%;
+  --foreground: 210 20% 97%;
+  --surface: 222 20% 8%;
+  --surface-hover: 222 18% 11%;
+  --border: 220 14% 100% / 0.08;
+  --muted: 215 14% 60%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 210 20% 98%;
+  --primary-dim: 217 60% 30%;
+  --accent: 199 89% 64%;
+  --success: 152 69% 50%;
+  --warning: 38 92% 58%;
+}
+
+.light {
+  --background: 0 0% 100%;
+  --foreground: 222 24% 8%;
+  --surface: 220 30% 98%;
+  --surface-hover: 220 25% 95%;
+  --border: 220 14% 8% / 0.08;
+  --muted: 215 16% 40%;
+  --primary: 217 91% 50%;
+  --primary-foreground: 0 0% 100%;
+  --primary-dim: 217 70% 90%;
+  --accent: 199 89% 44%;
+  --success: 152 60% 36%;
+  --warning: 38 80% 44%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+::selection {
+  background-color: hsl(var(--primary) / 0.3);
+  color: hsl(var(--foreground));
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.4);
+}
+
+:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background-color: hsl(var(--surface) / 0.6);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid hsl(var(--border));
+  }
+
+  .glass-hover {
+    transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
+  }
+  .glass-hover:hover {
+    background-color: hsl(var(--surface-hover) / 0.75);
+    border-color: hsl(var(--primary) / 0.35);
+  }
+
+  .container-px {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .text-gradient {
+    background: linear-gradient(120deg, hsl(var(--foreground)), hsl(var(--primary)) 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .grid-mask {
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
+  }
+}
